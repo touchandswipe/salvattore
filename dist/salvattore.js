@@ -1,5 +1,5 @@
 /*!
- * Salvattore 1.0.5 by @rnmp and @ppold
+ * Salvattore 1.0.7 by @rnmp and @ppold
  * https://github.com/rnmp/salvattore
  */
 (function(root, factory) {
@@ -352,8 +352,15 @@ self.getCSSRules = function getCSSRules(stylesheet) {
 self.getStylesheets = function getStylesheets() {
   // returns a list of all the styles in the document (that are accessible).
 
+  var inlineStyleBlocks = Array.prototype.slice.call(document.querySelectorAll("style"));
+  inlineStyleBlocks.forEach(function(stylesheet, idx) {
+    if (stylesheet.type !== 'text/css' && stylesheet.type !== '') {
+      inlineStyleBlocks.splice(idx, 1);
+    }
+  });
+
   return Array.prototype.concat.call(
-    Array.prototype.slice.call(document.querySelectorAll("style[type='text/css']")),
+    inlineStyleBlocks,
     Array.prototype.slice.call(document.querySelectorAll("link[rel='stylesheet']"))
   );
 };
@@ -558,7 +565,7 @@ self.init = function init() {
   // configuration.
 
   var css = document.createElement("style");
-  css.innerHTML = "[data-columns]::before{visibility:hidden;position:absolute;font-size:1px;}";
+  css.innerHTML = "[data-columns]::before{display:block;visibility:hidden;position:absolute;font-size:1px;}";
   document.head.appendChild(css);
 
   // scans all the grids in the document and generates
@@ -577,6 +584,7 @@ return {
   registerGrid: self.registerGrid,
   recreateColumns: self.recreateColumns,
   rescanMediaQueries: self.rescanMediaQueries,
+  init: self.init,
 
   // maintains backwards compatibility with underscore style method names
   append_elements: self.appendElements,
